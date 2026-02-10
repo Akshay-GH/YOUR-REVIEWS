@@ -1,9 +1,3 @@
-import * as React from 'react';
+import { Resend } from "resend";
 
-interface EmailTemplateProps {
-  firstName: string;
-}
-
-export function EmailTemplate({ firstName }: EmailTemplateProps) {
-  return 
-}
+export const resend = new Resend(process.env.RESEND_API_KEY)
