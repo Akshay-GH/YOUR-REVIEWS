@@ -6,6 +6,7 @@ An anonymous feedback platform where users can receive anonymous messages throug
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss)
+![License](https://img.shields.io/badge/License-MIT-yellow?logo=opensourceinitiative)
 
 ---
 
@@ -165,8 +166,7 @@ npm run lint     # Run ESLint
 
 ## 📄 License
 
-A learning project which taught me a lot of things (how to build a end to end full stack project )
-
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
