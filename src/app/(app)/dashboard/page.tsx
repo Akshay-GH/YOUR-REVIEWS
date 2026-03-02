@@ -5,6 +5,7 @@ import React, { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { acceptMessageSchema } from "@/schemas/acceptMessageSchema";
@@ -28,7 +29,8 @@ export default function Page() {
     );
   };
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(acceptMessageSchema),
   });
@@ -104,7 +106,7 @@ export default function Page() {
   // handle switch change to accept messages
   const handleSwitchChange = async () => {
     try {
-      const response = await axios.post<ApiResponse>("/api/accept-messages", {
+      const response = await axios.post<ApiResponse>("/api/accept-message", {
         acceptMessages: !acceptMessages,
       });
       setValue("acceptMessages", !acceptMessages);
@@ -121,8 +123,13 @@ export default function Page() {
     }
   };
 
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
   if (!session || !session.user) {
-    return <div>Please Login.</div>;
+    router.replace("/");
+    return null;
   }
 
   return (
