@@ -27,7 +27,7 @@ function page() {
   const [userNameMessage, setUserNameMessage] = useState("");
   const [isCheckingUserName, setIsCheckingUserName] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const debounced = useDebounceCallback(setUserName, 300);
+  const debounced = useDebounceCallback(setUserName, 500);
  
   const router = useRouter();
 
@@ -43,7 +43,7 @@ function page() {
         setUserNameMessage("");
         try {
           const response = await axios.get(
-            `/api/check-userName-unique?userName=${userName}`
+            `/api/check-username-unique?userName=${userName}`
           );
           setUserNameMessage(response.data.message);
         } catch (error) {
@@ -78,8 +78,8 @@ function page() {
       const errorMessage =
         axiosError.response?.data.message || "Sign Up Failed";
       toast.error(
-         "Sign Up Failed",{
-        description: errorMessage,
+      "Sign Up Failed",{
+      description: errorMessage,
        
       });
       setIsSubmitting(false);
@@ -91,7 +91,7 @@ function page() {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Join Your Reviews
+            Join Mystry Messages
           </h1>
           <p className="mb-4">Sign up to start your anonymous adventure</p>
         </div>
