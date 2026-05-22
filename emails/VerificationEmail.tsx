@@ -20,6 +20,7 @@ export default function VerificationEmail({
   otp,
 }: VerificationEmailProps) {
   return (
+    <>
     <Html lang="en" dir="ltr">
       <Head>
         <title>Verification Code</title>
@@ -33,6 +34,7 @@ export default function VerificationEmail({
           fontWeight={400}
           fontStyle="normal"
         />
+
       </Head>
       <Preview>Here&apos;s your verification code: {otp}</Preview>
       <Section>
@@ -63,5 +65,6 @@ export default function VerificationEmail({
           </Row> */}
       </Section>
     </Html>
+    </>
   );
 }
