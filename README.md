@@ -1,4 +1,4 @@
-# 🕵️ Mystery Message
+# 🕵️ MessageMint
 
 An anonymous feedback platform where users can receive anonymous messages through a unique shareable link. Built with **Next.js 16**, **MongoDB**, and **AI-powered** message suggestions.
 

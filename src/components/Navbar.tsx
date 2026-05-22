@@ -19,19 +19,19 @@ function Navbar() {
 
   return (
     <>
-      <nav className="p-4 md:p-6 shadow-md bg-gray-900 text-white">
-        <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
-          <Link href="/" className="text-xl font-bold mb-4 md:mb-0">
-            Mystery Message
+      <nav className="sticky top-0 z-50 border-b border-white/70 bg-white/70 text-slate-900 shadow-sm backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 px-4 py-4 md:flex-row md:gap-6 md:px-8">
+          <Link href="/" className="text-xl font-semibold tracking-tight">
+            Message Mint
           </Link>
           {session ? (
             <>
-              <span className="mr-4">
+              <span className="text-sm text-slate-600">
                 Welcome, {user.userName || user.email}
               </span>
               <div className="flex gap-4">
                 <Button
-                  className={`${isDashboard ? "hidden" : "block"} w-full md:w-auto bg-slate-100 text-black`}
+                  className={`${isDashboard ? "hidden" : "block"} w-full md:w-auto rounded-full border-slate-300 bg-white/80 text-slate-900`}
                   variant="outline"
                 >
                   <Link href="/dashboard" className="font-bold mb-4 md:mb-0">
@@ -40,8 +40,7 @@ function Navbar() {
                 </Button>
                 <Button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="font-bold w-full md:w-auto bg-slate-100 text-black"
-                  variant="outline"
+                  className="w-full md:w-auto rounded-full bg-slate-900 text-white hover:bg-slate-800"
                 >
                   Logout
                 </Button>
@@ -50,8 +49,7 @@ function Navbar() {
           ) : (
             <Link href="/sign-in">
               <Button
-                className="w-full md:w-auto bg-slate-100 text-black"
-                variant={"outline"}
+                className="w-full md:w-auto rounded-full bg-slate-900 text-white hover:bg-slate-800"
               >
                 Login
               </Button>

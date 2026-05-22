@@ -1,11 +1,11 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Mail } from "lucide-react"; // Assuming you have an icon for messages
+import { Mail, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Autoplay from "embla-carousel-autoplay";
 import messages from "@/messages.json";
+import { DM_Serif_Display, Space_Grotesk } from "next/font/google";
 
 import {
   Carousel,
@@ -15,51 +15,125 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
+const headingFont = DM_Serif_Display({
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
+const bodyFont = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export default function Home() {
   return (
     <>
-      {/* Main content */}
-      <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-24 py-12 bg-gray-800 text-white min-h-screen">
-        <section className="text-center mb-8 md:mb-12">
-          <h1 className="text-3xl md:text-5xl font-bold">
-            Dive into the World of Anonymous Feedback
-          </h1>
-          <p className="mt-3 md:mt-4 text-base md:text-lg">
-            True Feedback - Where your identity remains a secret.
-          </p>
-        </section>
+      <main
+        className={`${bodyFont.className} relative min-h-screen overflow-hidden text-slate-900`}
+      >
+        <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#ff6b6b_0%,transparent_60%)] opacity-40 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-[-120px] right-[-80px] h-80 w-80 rounded-full bg-[radial-gradient(circle,#22c55e_0%,transparent_60%)] opacity-30 blur-3xl" />
+        <div className="pointer-events-none absolute left-[-120px] top-1/3 h-64 w-64 rounded-full bg-[radial-gradient(circle,#6366f1_0%,transparent_60%)] opacity-25 blur-3xl" />
 
-        {/* Carousel for Messages */}
-        <Carousel
-          plugins={[Autoplay({ delay: 2000 })]}
-          className="w-full max-w-lg md:max-w-xl"
-        >
-          <CarouselContent>
-            {messages.map((message, index) => (
-              <CarouselItem key={index} className="p-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{message.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col md:flex-row items-start space-y-2 md:space-y-0 md:space-x-4">
-                    <Mail className="flex-shrink-0" />
-                    <div>
-                      <p>{message.content}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {message.received}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+        <section className="relative mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-20 pt-16 md:flex-row md:items-center md:gap-16 md:px-8">
+          <div className="flex-1 space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-slate-600 shadow-sm">
+              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+              Honest feedback, zero awkwardness
+            </div>
+
+            <h1
+              className={`${headingFont.className} text-4xl leading-tight tracking-tight text-slate-900 md:text-6xl`}
+            >
+              Make anonymous feedback feel safe, elegant, and actually useful.
+            </h1>
+            <p className="max-w-xl text-base leading-relaxed text-slate-600 md:text-lg">
+              Share a link, invite candid notes, and keep the tone positive with
+              AI-powered conversation starters. Perfect for creators, teams, and
+              community builders.
+            </p>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="rounded-full px-6 text-base">
+                <Link href="/sign-up">Start your inbox</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-full border-slate-300 px-6 text-base"
+              >
+                <Link href="/sign-in">I already have an account</Link>
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 text-sm text-slate-600 md:grid-cols-3">
+              <div className="rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm">
+                <p className="text-slate-900">Spam protection</p>
+                <p className="text-xs text-slate-500">Accept or pause inboxes.</p>
+              </div>
+              <div className="rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm">
+                <p className="text-slate-900">AI icebreakers</p>
+                <p className="text-xs text-slate-500">Keep messages thoughtful.</p>
+              </div>
+              <div className="rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm">
+                <p className="text-slate-900">Private by default</p>
+                <p className="text-xs text-slate-500">Only you see the inbox.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1">
+            <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-700">
+                  Live community notes
+                </p>
+                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                  New
+                </span>
+              </div>
+
+              <Carousel
+                plugins={[Autoplay({ delay: 2600 })]}
+                className="mt-6"
+              >
+                <CarouselContent>
+                  {messages.map((message, index) => (
+                    <CarouselItem key={index} className="p-2">
+                      <Card className="border-slate-200/60 bg-white/90 shadow-md">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-base text-slate-900">
+                            {message.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-start gap-3 text-sm text-slate-600">
+                          <div className="flex items-start gap-3">
+                            <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+                              <Mail className="h-4 w-4" />
+                            </span>
+                            <div>
+                              <p className="text-slate-700">{message.content}</p>
+                              <p className="text-xs text-slate-400">
+                                {message.received}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="-left-4" />
+                <CarouselNext className="-right-4" />
+              </Carousel>
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="text-center p-4 md:p-6 bg-gray-900 text-white">
-        © 2023 True Feedback. All rights reserved.
+      <footer className="text-center p-4 md:p-6 border-t border-white/60 bg-white/70 text-slate-600">
+        © 2026 True Feedback. All rights reserved.
       </footer>
     </>
   );

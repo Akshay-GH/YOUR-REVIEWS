@@ -20,7 +20,7 @@ export async function sendVerificationEmail(
     await transporter.sendMail({
       from: `"Your Reviews" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Mystery Message | Verification Code",
+      subject: "Message Mint | Verification Code",
       html: `
         <div style="font-family: Roboto, Verdana, sans-serif; padding: 20px;">
           <h2>Hello ${userName},</h2>
