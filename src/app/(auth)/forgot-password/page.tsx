@@ -1,12 +1,12 @@
 "use client";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { signInSchema } from "@/schemas/signInSchema";
+import { forgotPasswordSchema } from "@/schemas/forgotPasswordSchema";
 import {
   Form,
   FormField,
@@ -18,36 +18,35 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { signIn } from "next-auth/react";
+import axios, { AxiosError } from "axios";
+import { ApiResponse } from "@/types/apiResponse";
+
 function page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const router = useRouter();
-
-  const form = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: { identifier: "", password: "" },
+  const form = useForm<z.infer<typeof forgotPasswordSchema>>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: "" },
   });
 
-  const onSubmit = async (data: z.infer<typeof signInSchema>) => {
+  const onSubmit = async (data: z.infer<typeof forgotPasswordSchema>) => {
     setIsSubmitting(true);
-    const result = await signIn("credentials", {
-      redirect: false,
-      identifier: data.identifier,
-      password: data.password,
-    });
-    if (result?.error) {
-      toast.error("Login Failed", {
-        description: "Incorrect Username or password",
+    try {
+      const response = await axios.post<ApiResponse>(
+        "/api/forgot-password",
+        data,
+      );
+      toast("Check your inbox", { description: response.data.message });
+      form.reset();
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      toast("Error", {
+        description:
+          axiosError.response?.data.message || "Unable to send reset link",
       });
+    } finally {
+      setIsSubmitting(false);
     }
-    if (result?.url) {
-      toast.success("Success", {
-        description: "Login Successfully",
-      });
-      router.replace("/dashboard");
-    }
-    setIsSubmitting(false);
   };
 
   return (
@@ -61,54 +60,29 @@ function page() {
               MessageMint
             </span>
             <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-              Welcome back
+              Reset your password
             </h1>
             <p className="mt-2 text-sm text-slate-600">
-              Sign in to see what people are saying.
+              We will send a reset link to your email.
             </p>
           </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
-                name="identifier"
+                name="email"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email or Username</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="email" {...field} />
+                      <Input placeholder="you@example.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                name="password"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        href="/forgot-password"
-                        className="text-xs font-semibold text-slate-600 hover:text-slate-900"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <Input
-                        placeholder="password"
-                        {...field}
-                        type="password"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <Button
                 type="submit"
                 disabled={isSubmitting}
@@ -116,21 +90,20 @@ function page() {
               >
                 {isSubmitting ? (
                   <>
-                    {" "}
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
-                    wait{" "}
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending
                   </>
                 ) : (
-                  "Sign in"
+                  "Send reset link"
                 )}
               </Button>
             </form>
           </Form>
+
           <div className="text-center text-sm text-slate-600">
             <p>
-              Don't have an account?{" "}
-              <Link href="/sign-up" className="font-semibold text-slate-900">
-                Sign up
+              Remembered your password?{" "}
+              <Link href="/sign-in" className="font-semibold text-slate-900">
+                Sign in
               </Link>
             </p>
           </div>

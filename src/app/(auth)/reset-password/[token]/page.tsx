@@ -1,12 +1,13 @@
 "use client";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import Link from "next/link";
 import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { signInSchema } from "@/schemas/signInSchema";
+import { resetPasswordSchema } from "@/schemas/resetPasswordSchema";
 import {
   Form,
   FormField,
@@ -18,36 +19,46 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { signIn } from "next-auth/react";
+import axios, { AxiosError } from "axios";
+import { ApiResponse } from "@/types/apiResponse";
+
 function page() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const { token } = useParams<{ token: string }>();
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: { identifier: "", password: "" },
+  const form = useForm<z.infer<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { password: "", confirmPassword: "" },
   });
 
-  const onSubmit = async (data: z.infer<typeof signInSchema>) => {
+  const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
+    if (!token) {
+      const message = "Reset link is invalid or expired";
+      setResetError(message);
+      toast("Error", { description: message });
+      return;
+    }
+
     setIsSubmitting(true);
-    const result = await signIn("credentials", {
-      redirect: false,
-      identifier: data.identifier,
-      password: data.password,
-    });
-    if (result?.error) {
-      toast.error("Login Failed", {
-        description: "Incorrect Username or password",
+    setResetError(null);
+    try {
+      const response = await axios.post<ApiResponse>("/api/reset-password", {
+        token,
+        password: data.password,
       });
+      toast("Success", { description: response.data.message });
+      router.replace("/sign-in");
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      const message =
+        axiosError.response?.data.message || "Unable to reset password";
+      setResetError(message);
+      toast("Error", { description: message });
+    } finally {
+      setIsSubmitting(false);
     }
-    if (result?.url) {
-      toast.success("Success", {
-        description: "Login Successfully",
-      });
-      router.replace("/dashboard");
-    }
-    setIsSubmitting(false);
   };
 
   return (
@@ -61,54 +72,61 @@ function page() {
               MessageMint
             </span>
             <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-              Welcome back
+              Set a new password
             </h1>
             <p className="mt-2 text-sm text-slate-600">
-              Sign in to see what people are saying.
+              Choose a strong password you will remember.
             </p>
           </div>
 
+          {resetError && (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              {resetError}. Request a new link from{" "}
+              <Link href="/forgot-password" className="font-semibold">
+                forgot password
+              </Link>
+              .
+            </div>
+          )}
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                name="identifier"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email or Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 name="password"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        href="/forgot-password"
-                        className="text-xs font-semibold text-slate-600 hover:text-slate-900"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
+                    <FormLabel>New password</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="password"
-                        {...field}
                         type="password"
+                        placeholder="New password"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <FormField
+                name="confirmPassword"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Confirm password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <Button
                 type="submit"
                 disabled={isSubmitting}
@@ -116,21 +134,20 @@ function page() {
               >
                 {isSubmitting ? (
                   <>
-                    {" "}
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
-                    wait{" "}
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating
                   </>
                 ) : (
-                  "Sign in"
+                  "Update password"
                 )}
               </Button>
             </form>
           </Form>
+
           <div className="text-center text-sm text-slate-600">
             <p>
-              Don't have an account?{" "}
-              <Link href="/sign-up" className="font-semibold text-slate-900">
-                Sign up
+              Back to{" "}
+              <Link href="/sign-in" className="font-semibold text-slate-900">
+                Sign in
               </Link>
             </p>
           </div>

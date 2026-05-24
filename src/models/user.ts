@@ -10,7 +10,7 @@ const MessageSchema: Schema<Message> = new mongoose.Schema({
     type: String,
     required: true,
   },
-  createdAt: { 
+  createdAt: {
     type: Date,
     required: true,
     default: Date.now,
@@ -23,6 +23,8 @@ export interface User extends Document {
   password: string;
   verifyCode: string;
   verifyCodeExpiry: Date;
+  resetPasswordToken?: string | null;
+  resetPasswordTokenExpiry?: Date | null;
   isVerified: Boolean;
   isAcceptingMessage: boolean;
   messages: Message[];
@@ -53,6 +55,14 @@ const UserSchema: Schema<User> = new Schema({
     type: Date,
     required: [true, "Verify Code Expiry is required"],
   },
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordTokenExpiry: {
+    type: Date,
+    default: null,
+  },
   isVerified: {
     type: Boolean,
     default: false,
@@ -65,7 +75,11 @@ const UserSchema: Schema<User> = new Schema({
   messages: [MessageSchema],
 });
 
+if (process.env.NODE_ENV === "development" && mongoose.models.User) {
+  delete mongoose.models.User;
+}
 
-const  UserModel =(mongoose.models.User as mongoose.Model<User>) || mongoose.model<User>("User",UserSchema)
+const UserModel =
+  (mongoose.models.User as mongoose.Model<User>) ||
+  mongoose.model<User>("User", UserSchema);
 export default UserModel;
- 

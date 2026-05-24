@@ -36,24 +36,32 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
       onMessageDelete(message._id.toString());
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      toast(
-         "Error",{
+      toast("Error", {
         description:
           axiosError.response?.data.message ?? "Failed to delete message",
-      
       });
     }
   };
 
   return (
-    <Card className="card-bordered">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>{message.content}</CardTitle>
+    <Card className="border-slate-200/70 bg-white/85 shadow-sm backdrop-blur">
+      <CardHeader className="space-y-3">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="text-base text-slate-900">
+              Anonymous note
+            </CardTitle>
+            <p className="text-xs text-slate-500">
+              {dayjs(message.createdAt).format("MMM D, YYYY h:mm A")}
+            </p>
+          </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <X className="w-5 h-5" />
+              <Button
+                variant="outline"
+                className="h-9 w-9 rounded-full border-slate-200 text-slate-500 hover:text-slate-700"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -73,11 +81,10 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        <div className="text-sm">
-          {dayjs(message.createdAt).format("MMM D, YYYY h:mm A")}
-        </div>
       </CardHeader>
-      <CardContent></CardContent>
+      <CardContent className="pt-0 text-sm text-slate-700">
+        {message.content}
+      </CardContent>
     </Card>
   );
 }

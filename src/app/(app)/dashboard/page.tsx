@@ -133,61 +133,126 @@ export default function Page() {
   }
 
   return (
-    <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
-      <h1 className="text-4xl font-bold mb-4">User Dashboard</h1>
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(60%_80%_at_20%_10%,#ffe7b8_0%,#fff7ea_40%,#f7f2ff_70%,#eef2ff_100%)]">
+      <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#ff6b6b_0%,transparent_60%)] opacity-30 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-[-120px] right-[-80px] h-80 w-80 rounded-full bg-[radial-gradient(circle,#22c55e_0%,transparent_60%)] opacity-20 blur-3xl" />
 
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Copy Your Unique Link</h2>{" "}
-        <div className="flex items-center">
-          <input
-            type="text"
-            value={profileUrl}
-            disabled
-            className="input input-bordered w-full p-2 mr-2 text-sm"
-          />
-          <Button onClick={copyToClipboard}>Copy</Button>
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-10">
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              Message Mint
+            </p>
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+              Dashboard
+            </h1>
+            <p className="text-sm text-slate-600">
+              Manage your inbox, share your link, and keep the vibe positive.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-lg backdrop-blur">
+              <h2 className="text-base font-semibold text-slate-900">
+                Your shareable link
+              </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                Anyone with this link can send you an anonymous message.
+              </p>
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  type="text"
+                  value={profileUrl}
+                  disabled
+                  className="w-full rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm text-slate-600 shadow-sm"
+                />
+                <Button
+                  onClick={copyToClipboard}
+                  className="rounded-full bg-slate-900 text-white hover:bg-slate-800"
+                >
+                  Copy link
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-lg backdrop-blur">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-base font-semibold text-slate-900">
+                    Accepting messages
+                  </h2>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Pause your inbox whenever you need a break.
+                  </p>
+                </div>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    acceptMessages
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-slate-200 text-slate-600"
+                  }`}
+                >
+                  {acceptMessages ? "On" : "Off"}
+                </span>
+              </div>
+              <div className="mt-4 flex items-center gap-3">
+                <Switch
+                  {...register("acceptMessages")}
+                  checked={acceptMessages}
+                  onCheckedChange={handleSwitchChange}
+                  disabled={isSwitchLoading}
+                />
+                <span className="text-sm text-slate-600">
+                  {acceptMessages
+                    ? "You are currently accepting new messages."
+                    : "Your inbox is paused."}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <Separator className="bg-white/60" />
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Inbox</h2>
+              <p className="text-xs text-slate-500">
+                {messages.length} message{messages.length === 1 ? "" : "s"}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              className="rounded-full border-slate-200 bg-white/80"
+              onClick={(e) => {
+                e.preventDefault();
+                fetchMessages(true);
+              }}
+            >
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCcw className="mr-2 h-4 w-4" />
+              )}
+              Refresh
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {messages.length > 0 ? (
+              messages.map((msg, index) => (
+                <MessageCard
+                  key={msg._id?.toString() || index}
+                  message={msg}
+                  onMessageDelete={handleDeleteMessage}
+                />
+              ))
+            ) : (
+              <div className="rounded-3xl border border-dashed border-slate-200 bg-white/70 p-8 text-center text-sm text-slate-500">
+                No messages yet. Share your link to start collecting feedback.
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-
-      <div className="mb-4">
-        <Switch
-          {...register("acceptMessages")}
-          checked={acceptMessages}
-          onCheckedChange={handleSwitchChange}
-          disabled={isSwitchLoading}
-        />
-        <span className="ml-2">
-          Accept Messages: {acceptMessages ? "On" : "Off"}
-        </span>
-      </div>
-      <Separator />
-
-      <Button
-        className="mt-4"
-        variant="outline"
-        onClick={(e) => {
-          e.preventDefault();
-          fetchMessages(true);
-        }}
-      >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <RefreshCcw className="h-4 w-4" />
-        )}
-      </Button>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {messages.length > 0 ? (
-          messages.map((msg, index) => (
-            <MessageCard
-              key={msg._id?.toString() || index}
-              message={msg}
-              onMessageDelete={handleDeleteMessage}
-            />
-          ))
-        ) : (
-          <p>No messages to display.</p>
-        )}
       </div>
     </div>
   );
