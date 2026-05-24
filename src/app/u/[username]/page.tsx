@@ -45,7 +45,7 @@ export default function PublicProfilePage() {
     setIsSending(true);
     try {
       const response = await axios.post<ApiResponse>("/api/send-messages", {
-        userName: username,
+        userName: decodeURIComponent(username),
         content: data.content,
       });
       toast("Success", { description: response.data.message });
@@ -97,67 +97,102 @@ export default function PublicProfilePage() {
   };
 
   return (
-    <div className="container mx-auto my-8 p-6 bg-white rounded max-w-4xl">
-      <h1 className="text-4xl font-bold text-center mb-6">
-        send an anonymous message to @{username}
-      </h1>
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(60%_80%_at_20%_10%,#ffe7b8_0%,#fff7ea_40%,#f7f2ff_70%,#eef2ff_100%)]">
+      <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#ff6b6b_0%,transparent_60%)] opacity-30 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-[-120px] right-[-80px] h-80 w-80 rounded-full bg-[radial-gradient(circle,#22c55e_0%,transparent_60%)] opacity-20 blur-3xl" />
 
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">
-            Write Your Anonymous Message
-        </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <textarea
-            {...register("content")}
-            placeholder="Write your anonymous message here"
-            className="w-full p-3 border rounded-md min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-gray-300"
-          />
-          {errors.content && (
-            <p className="text-red-500 text-sm">{errors.content.message}</p>
-          )}
-          <div className="flex justify-center">
-            <Button type="submit" disabled={isSending}>
-              {isSending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : null}
-              Send It
-            </Button>
+      <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-12">
+        <div className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+            Message Mint
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+            Send a thoughtful note to @{decodeURIComponent(username)}
+          </h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Messages are anonymous. Keep it kind and constructive.
+          </p>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
+          <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur">
+            <h2 className="text-base font-semibold text-slate-900">
+              Write your message
+            </h2>
+            <p className="mt-1 text-xs text-slate-500">
+              Aim for at least 10 characters. Max 300.
+            </p>
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-4">
+              <textarea
+                {...register("content")}
+                placeholder="Share something thoughtful..."
+                className="min-h-[140px] w-full resize-none rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
+              />
+              {errors.content && (
+                <p className="text-sm text-rose-500">
+                  {errors.content.message}
+                </p>
+              )}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <span className="text-xs text-slate-500">
+                  Your message will be sent instantly.
+                </span>
+                <Button
+                  type="submit"
+                  disabled={isSending}
+                  className="rounded-full bg-slate-900 text-white hover:bg-slate-800"
+                >
+                  {isSending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  Send message
+                </Button>
+              </div>
+            </form>
           </div>
-        </form>
+
+          <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur">
+            <h2 className="text-base font-semibold text-slate-900">
+              Need inspiration?
+            </h2>
+            <p className="mt-1 text-xs text-slate-500">
+              Tap for AI-written starters. Click one to autofill.
+            </p>
+            <Button
+              onClick={handleSuggestMessages}
+              disabled={isSuggestLoading}
+              variant="outline"
+              className="mt-4 w-full rounded-full border-slate-200 bg-white/80"
+            >
+              {isSuggestLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              Suggest messages
+            </Button>
+
+            {suggestedMessages.length > 0 && (
+              <Card className="mt-6 border-slate-200/70 bg-white/80 shadow-sm">
+                <CardHeader>
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    Suggestions
+                  </h3>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {suggestedMessages.map((msg, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleMessageClick(msg)}
+                      className="w-full rounded-2xl border border-slate-200 bg-white/90 px-3 py-3 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                    >
+                      {msg}
+                    </button>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
       </div>
-
-      <Separator className="my-6" />
-
-      <div className="mb-4">
-        <Button onClick={handleSuggestMessages} disabled={isSuggestLoading}>
-          {isSuggestLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : null}
-          Suggest Messages
-        </Button>
-        <p className="text-sm text-muted-foreground mt-2">
-          Click on any message below to select it.
-        </p>
-      </div>
-
-      {suggestedMessages.length > 0 && (
-        <Card>
-          <CardHeader>
-            <h3 className="text-xl font-bold">Messages</h3>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {suggestedMessages.map((msg, index) => (
-              <button
-                key={index}
-                onClick={() => handleMessageClick(msg)}
-                className="w-full text-left p-3 border rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                {msg}
-              </button>
-            ))}
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

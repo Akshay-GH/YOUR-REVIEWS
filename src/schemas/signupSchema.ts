@@ -4,7 +4,7 @@ export const userNameValidation = z
   .string()
   .min(2, "UserName must be atleast 2 characters")
   .max(20, "UserName must be no more than 20 characters")
-  .regex(/^[a-zA-Z0-9_]+$/, "UserName must not contain special character");
+  .regex(/^[a-zA-Z0-9_ ]+$/, "UserName must not contain special character");
 
 export const emailValidation = z.string().email({ message: "Invalid Email" });
 
