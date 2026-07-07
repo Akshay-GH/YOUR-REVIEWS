@@ -22,7 +22,7 @@ function Navbar() {
       <nav className="sticky top-0 z-50 border-b border-white/70 bg-white/70 text-slate-900 shadow-sm backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 px-4 py-4 md:flex-row md:gap-6 md:px-8">
           <Link href="/" className="text-xl font-semibold tracking-tight">
-            Message Mint
+            MessageMint
           </Link>
           {session ? (
             <>

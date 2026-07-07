@@ -2,6 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/user";
 import { z } from "zod";
 import { userNameValidation } from "@/schemas/signupSchema";
+import { normalizeUserName } from "@/lib/username";
 
 const UserNameQuerySchema = z.object({
   userName: userNameValidation,
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const { userName } = result.data;
+    const userName = normalizeUserName(result.data.userName);
     const existingVerifiedUser = await UserModel.findOne({
       userName,
       isVerified: true,

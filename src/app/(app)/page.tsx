@@ -133,7 +133,7 @@ export default function Home() {
       </main>
 
       <footer className="text-center p-4 md:p-6 border-t border-white/60 bg-white/70 text-slate-600">
-        © 2026 True Feedback. All rights reserved.
+        © 2026 MessageMint. All rights reserved.
       </footer>
     </>
   );

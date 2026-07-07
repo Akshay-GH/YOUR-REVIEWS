@@ -2,10 +2,12 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/user"
 import bcrypt from "bcryptjs";
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
+import { normalizeUserName } from "@/lib/username";
 export async function POST(request: Request) {
   await dbConnect();
   try {
-    const { userName, email, password } = await request.json();
+    const { userName: rawUserName, email, password } = await request.json();
+    const userName = normalizeUserName(rawUserName);
     const existingUserVerifiedByUserName = await UserModel.findOne({
       userName,
       isVerified: true,

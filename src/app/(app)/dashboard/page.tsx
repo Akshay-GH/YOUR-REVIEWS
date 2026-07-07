@@ -15,13 +15,17 @@ import { ApiResponse } from "@/types/apiResponse";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, RefreshCcw } from "lucide-react";
+import { EyeOff, Loader2, RefreshCcw, Save } from "lucide-react";
 import { MessageCard } from "@/components/messageCard";
 
 export default function Page() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
+  const [purpose, setPurpose] = useState("");
+  const [isPurposeLoading, setIsPurposeLoading] = useState(false);
+  const [showFilteredMessages, setShowFilteredMessages] = useState(false);
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
 
   const handleDeleteMessage = (messageid?: string) => {
     setMessages(
@@ -68,6 +72,38 @@ export default function Page() {
     }
   }, [setValue]);
 
+  const fetchPurpose = useCallback(async () => {
+    setIsPurposeLoading(true);
+    try {
+      const response = await axios.get<ApiResponse>("/api/message-purpose");
+      setPurpose(response.data.purpose || "");
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      toast("Error", {
+        description:
+          axiosError.response?.data.message || "Failed to fetch message purpose",
+      });
+    } finally {
+      setIsPurposeLoading(false);
+    }
+  }, []);
+
+  const fetchFilterSettings = useCallback(async () => {
+    setIsFilterLoading(true);
+    try {
+      const response = await axios.get<ApiResponse>("/api/filter-settings");
+      setShowFilteredMessages(Boolean(response.data.showFilteredMessages));
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      toast("Error", {
+        description:
+          axiosError.response?.data.message || "Failed to fetch filter settings",
+      });
+    } finally {
+      setIsFilterLoading(false);
+    }
+  }, []);
+
   const fetchMessages = useCallback(
     async (refresh: boolean = false) => {
       setLoading(true);
@@ -101,7 +137,16 @@ export default function Page() {
     }
     fetchMessages();
     fetchAcceptingMessages();
-  }, [session, setValue, fetchAcceptingMessages, fetchMessages]);
+    fetchPurpose();
+    fetchFilterSettings();
+  }, [
+    session,
+    setValue,
+    fetchAcceptingMessages,
+    fetchMessages,
+    fetchPurpose,
+    fetchFilterSettings,
+  ]);
 
   // handle switch change to accept messages
   const handleSwitchChange = async () => {
@@ -123,6 +168,52 @@ export default function Page() {
     }
   };
 
+  const handlePurposeSave = async () => {
+    setIsPurposeLoading(true);
+    try {
+      const response = await axios.post<ApiResponse>("/api/message-purpose", {
+        purpose,
+      });
+      setPurpose(response.data.purpose || "");
+      toast("Success", {
+        description: response.data.message,
+      });
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      toast("Error", {
+        description:
+          axiosError.response?.data.message || "Failed to update message purpose",
+      });
+    } finally {
+      setIsPurposeLoading(false);
+    }
+  };
+
+  const handleFilteredMessagesChange = async () => {
+    const nextValue = !showFilteredMessages;
+    setIsFilterLoading(true);
+
+    try {
+      const response = await axios.post<ApiResponse>("/api/filter-settings", {
+        showFilteredMessages: nextValue,
+      });
+
+      setShowFilteredMessages(Boolean(response.data.showFilteredMessages));
+      await fetchMessages();
+      toast("Success", {
+        description: response.data.message,
+      });
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      toast("Error", {
+        description:
+          axiosError.response?.data.message || "Failed to update filter settings",
+      });
+    } finally {
+      setIsFilterLoading(false);
+    }
+  };
+
   if (status === "loading") {
     return <div>Loading...</div>;
   }
@@ -141,7 +232,7 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-              Message Mint
+              MessageMint
             </p>
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
               Dashboard
@@ -208,6 +299,75 @@ export default function Page() {
                     : "Your inbox is paused."}
                 </span>
               </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-lg backdrop-blur">
+            <h2 className="text-base font-semibold text-slate-900">
+              Suggestion purpose
+            </h2>
+            <p className="mt-1 text-xs text-slate-500">
+              Tell the AI what kind of anonymous messages this link is for.
+            </p>
+            <div className="mt-4 flex flex-col gap-3">
+              <textarea
+                value={purpose}
+                onChange={(event) => setPurpose(event.target.value)}
+                maxLength={300}
+                rows={3}
+                placeholder="Feedback on my portfolio website"
+                className="min-h-[96px] w-full resize-none rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
+              />
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <span className="text-xs text-slate-500">
+                  {purpose.length}/300 characters
+                </span>
+                <Button
+                  onClick={handlePurposeSave}
+                  disabled={isPurposeLoading}
+                  className="rounded-full bg-slate-900 text-white hover:bg-slate-800"
+                >
+                  {isPurposeLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
+                  Save purpose
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-lg backdrop-blur">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-base font-semibold text-slate-900">
+                  Show filtered messages
+                </h2>
+                <p className="mt-1 text-xs text-slate-500">
+                  Include messages flagged for harassment, sexual content, or spam.
+                </p>
+              </div>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  showFilteredMessages
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-slate-200 text-slate-600"
+                }`}
+              >
+                {showFilteredMessages ? "Shown" : "Hidden"}
+              </span>
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+              <Switch
+                checked={showFilteredMessages}
+                onCheckedChange={handleFilteredMessagesChange}
+                disabled={isFilterLoading}
+              />
+              <span className="flex items-center gap-2 text-sm text-slate-600">
+                <EyeOff className="h-4 w-4" />
+                Threatening messages still require a separate reveal click.
+              </span>
             </div>
           </div>
 

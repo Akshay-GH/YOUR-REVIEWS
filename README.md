@@ -1,172 +1,118 @@
-# 🕵️ MessageMint
+# MessageMint
 
-An anonymous feedback platform where users can receive anonymous messages through a unique shareable link. Built with **Next.js 16**, **MongoDB**, and **AI-powered** message suggestions.
+MessageMint is a full-stack anonymous feedback platform for collecting honest, low-friction messages through a public shareable profile link. Link owners can create an account, verify their email, share a username-based URL, and manage incoming anonymous messages from a private dashboard. Visitors do not need to log in: they can open a public link, write a message, optionally use AI-generated contextual prompts, and submit feedback directly.
+
+The project goes beyond a basic message box by adding production-minded safety and reliability layers: IP-based rate limiting with Upstash Redis, Groq-powered content moderation before database writes, contextual AI suggestions based on the receiver's stated purpose, filtered-message controls for receivers, and secure account flows with NextAuth and email verification.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb)
+![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-green?logo=mongodb)
+![Upstash Redis](https://img.shields.io/badge/Upstash-Redis-00E9A3?logo=redis&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-AI-orange)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss)
 ![License](https://img.shields.io/badge/License-MIT-yellow?logo=opensourceinitiative)
 
 ---
 
-## ✨ Features
+## Features
 
-- **Anonymous Messaging** — Share your unique profile link and receive anonymous messages from anyone
-- **AI-Powered Suggestions** — Generate engaging message suggestions using Groq (LLaMA 3.3 70B)
-- **User Authentication** — Secure sign-up/sign-in with NextAuth.js (credentials provider)
-- **Email Verification** — OTP-based email verification via Nodemailer (Gmail SMTP)
-- **Dashboard** — Manage incoming messages, toggle message acceptance, and copy your profile link
-- **Real-time Controls** — Accept/reject messages toggle, refresh messages, and delete messages
-- **Responsive Design** — Fully responsive UI built with Tailwind CSS and shadcn/ui components
-
----
-
-## 🛠️ Tech Stack
-
-| Layer       | Technology                                      |
-| ----------- | ----------------------------------------------- |
-| Framework   | Next.js 16 (App Router)                         |
-| Language    | TypeScript                                      |
-| Database    | MongoDB Atlas + Mongoose                        |
-| Auth        | NextAuth.js v4 (Credentials)                    |
-| AI          | Vercel AI SDK + Groq (LLaMA 3.3 70B Versatile)  |
-| Email       | Nodemailer (Gmail SMTP)                         |
-| UI          | Tailwind CSS, shadcn/ui, Radix UI, Lucide Icons |
-| Validation  | Zod + React Hook Form                           |
-| HTTP Client | Axios                                           |
+- **Anonymous public links**: each user gets a shareable `/u/[username]` page where anyone can send feedback without signing in.
+- **Authenticated dashboard**: receivers can view, refresh, and delete incoming anonymous messages from a private dashboard.
+- **Message acceptance controls**: users can pause or resume their public inbox with an accepting-messages toggle.
+- **Upstash Redis rate limiting**: protects public message submission with per-link and global IP-based limits.
+- **AI content moderation**: classifies every incoming message with Groq before saving, marking content as safe, filtered, or unmoderated.
+- **Filtered-message visibility**: receivers can choose whether filtered messages appear, while threat-flagged content requires an explicit reveal click.
+- **Contextual AI suggestions**: visitors can generate three conversation starters tailored to the receiver's saved purpose.
+- **Custom link purpose**: receivers can describe what their board is for, such as portfolio feedback, career questions, or AMA prompts.
+- **Username normalization**: public links resolve consistently even when visitors type different username casing.
+- **Email verification and password reset**: account lifecycle flows are handled with OTP and reset emails via Nodemailer.
+- **Responsive UI**: built with Tailwind CSS, Radix/shadcn-style components, Lucide icons, and Sonner notifications.
 
 ---
 
-## 📁 Project Structure
+## Tech Stack
 
-```
-src/
-├── app/
-│   ├── (app)/              # Authenticated routes
-│   │   ├── dashboard/      # User dashboard
-│   │   └── page.tsx        # Home page with message carousel
-│   ├── (auth)/             # Auth routes
-│   │   ├── sign-in/
-│   │   ├── sign-up/
-│   │   └── verify/[username]/
-│   ├── api/
-│   │   ├── accept-message/ # Toggle message acceptance
-│   │   ├── auth/           # NextAuth configuration
-│   │   ├── chat/           # AI message suggestions
-│   │   ├── check-username-unique/
-│   │   ├── delete-message/[messageId]/
-│   │   ├── get-messages/
-│   │   ├── send-messages/
-│   │   ├── sign-up/
-│   │   └── verify-code/
-│   └── u/[username]/       # Public profile page
-├── components/             # UI components
-├── helpers/                # Email & session utilities
-├── lib/                    # DB connection & utils
-├── models/                 # Mongoose schemas
-├── schemas/                # Zod validation schemas
-└── types/                  # TypeScript type definitions
-```
+| Layer | Technology |
+| --- | --- |
+| Frontend | Next.js 16 App Router, React 19, TypeScript |
+| Backend | Next.js API routes, NextAuth.js credentials auth |
+| Database | MongoDB with Mongoose embedded message documents |
+| Rate Limiting | Upstash Redis REST API via `@upstash/redis` |
+| AI Suggestions | Vercel AI SDK with Groq `llama-3.3-70b-versatile` |
+| AI Moderation | Vercel AI SDK with Groq `llama-3.1-8b-instant` |
+| Email | Nodemailer with SMTP |
+| Forms & Validation | React Hook Form, Zod |
+| UI | Tailwind CSS 4, Radix UI, Lucide React, Sonner |
+| HTTP Client | Axios and native `fetch` |
 
 ---
 
-## 🚀 Getting Started
+## Architecture Overview
 
-### Prerequisites
+```mermaid
+flowchart LR
+  subgraph FE["Frontend"]
+    Browser["User Browser"]
+    NextApp["Next.js App"]
+  end
 
-- Node.js 18+
-- MongoDB Atlas account
-- Gmail account with App Password
-- Groq API key ([console.groq.com](https://console.groq.com))
+  subgraph BE["Backend"]
+    ApiRoutes["API Routes"]
+    AuthLayer["Auth Layer"]
+    Moderation["Moderation Util"]
+    RateLimit["Rate Limiter"]
+  end
 
-### 1. Clone the repository
+  subgraph EXT["External Services"]
+    Groq["Groq API"]
+    Redis["Upstash Redis"]
+    Email["SMTP Email"]
+  end
 
-```bash
-git clone https://github.com/your-username/your-reviews.git
-cd your-reviews
-```
+  subgraph STORE["Storage"]
+    Mongo["MongoDB"]
+  end
 
-### 2. Install dependencies
+  Browser -->|"open public link"| NextApp
+  NextApp -->|"send message"| ApiRoutes
+  ApiRoutes -->|"check rate limit"| RateLimit
+  RateLimit -->|"increment counters"| Redis
+  ApiRoutes -->|"classify message"| Moderation
+  Moderation -->|"moderation prompt"| Groq
+  ApiRoutes -->|"save feedback"| Mongo
+  NextApp -->|"request suggestions"| ApiRoutes
+  ApiRoutes -->|"generate prompts"| Groq
+  Browser -->|"sign in"| AuthLayer
+  AuthLayer -->|"read user"| Mongo
+  ApiRoutes -->|"send OTP"| Email
+  NextApp -->|"load dashboard"| ApiRoutes
+  ApiRoutes -->|"fetch messages"| Mongo
 
-```bash
-npm install
-```
+  classDef frontend fill:#dbeafe,stroke:#2563eb,color:#172554;
+  classDef backend fill:#ede9fe,stroke:#7c3aed,color:#2e1065;
+  classDef external fill:#ffedd5,stroke:#f97316,color:#7c2d12;
+  classDef storage fill:#ccfbf1,stroke:#0f766e,color:#134e4a;
 
-### 3. Set up environment variables
-
-Create a `.env.local` file in the root directory:
-
-```env
-# Database
-MONGODB_URI="your-mongodb-connection-string"
-
-# Authentication
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-
-# Email (Gmail SMTP)
-EMAIL_USER="your-gmail@gmail.com"
-EMAIL_PASS="your-gmail-app-password"
-
-# AI (Groq)
-GROQ_API_KEY="your-groq-api-key"
-```
-
-> **Gmail App Password:** Enable 2-Step Verification on your Google account, then generate an App Password at [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-
-### 4. Run the development server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## 📖 How It Works
-
-1. **Sign Up** → Register with username, email, and password
-2. **Verify Email** → Enter the 6-digit OTP sent to your email
-3. **Dashboard** → Copy your unique profile link (`/u/your-username`)
-4. **Share Link** → Anyone with the link can send you anonymous messages
-5. **AI Suggestions** → Visitors can click "Suggest Messages" for AI-generated conversation starters
-6. **Manage Messages** → View, refresh, and delete messages from your dashboard
-
----
-
-## 📜 API Routes
-
-| Method | Endpoint                          | Description                      |
-| ------ | --------------------------------- | -------------------------------- |
-| POST   | `/api/sign-up`                    | Register a new user              |
-| POST   | `/api/verify-code`                | Verify email with OTP            |
-| POST   | `/api/auth/[...nextauth]`         | NextAuth sign-in                 |
-| GET    | `/api/check-username-unique`      | Check username availability      |
-| GET    | `/api/accept-message`             | Get message acceptance status    |
-| POST   | `/api/accept-message`             | Toggle message acceptance        |
-| GET    | `/api/get-messages`               | Get all messages (authenticated) |
-| POST   | `/api/send-messages`              | Send anonymous message           |
-| DELETE | `/api/delete-message/[messageId]` | Delete a message                 |
-| POST   | `/api/chat`                       | AI-generated message suggestions |
-
----
-
-## 🧑‍💻 Scripts
-
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
+  class Browser,NextApp frontend;
+  class ApiRoutes,AuthLayer,Moderation,RateLimit backend;
+  class Groq,Redis,Email external;
+  class Mongo storage;
 ```
 
 ---
 
-## 📄 License
+## Future Improvements
+
+- **Shareable card generator**: let receivers turn selected anonymous messages into polished social media cards for Instagram, X, LinkedIn, or WhatsApp.
+- **Message analytics**: add dashboard insights for message volume, filtered-message trends, and response rates.
+- **Receiver replies**: allow link owners to publish optional public replies while keeping sender identity anonymous.
+- **Custom themes**: let users customize the public feedback page with colors, display names, and profile context.
+- **Stronger abuse controls**: add manual blocklists, per-country throttling, and admin review queues for repeated abuse.
+- **Export tools**: support CSV or JSON export for users who want to archive feedback or analyze it externally.
+
+---
+
+## License
 
 This project is licensed under the [MIT License](LICENSE).
-
----
-
