@@ -1,5 +1,5 @@
 {
-  "name": "your-reviews",
+  "name": "MessageMint",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -17,6 +17,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@react-email/components": "^1.0.7",
     "@react-email/render": "^2.0.4",
+    "@upstash/redis": "^1.38.0",
     "ai": "^6.0.78",
     "anthropic": "^0.0.0",
     "axios": "^1.13.5",

@@ -27,6 +27,10 @@ type MessageCardProps = {
 };
 
 export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
+  const [isThreatRevealed, setIsThreatRevealed] = useState(false);
+  const isFiltered = message.status === "filtered";
+  const isThreat = message.flagReason === "THREAT";
+
   const handleDeleteConfirm = async () => {
     try {
       const response = await axios.delete<ApiResponse>(
@@ -54,6 +58,11 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
             <p className="text-xs text-slate-500">
               {dayjs(message.createdAt).format("MMM D, YYYY h:mm A")}
             </p>
+            {isFiltered ? (
+              <p className="mt-2 w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                Filtered: {message.flagReason}
+              </p>
+            ) : null}
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -83,7 +92,22 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
         </div>
       </CardHeader>
       <CardContent className="pt-0 text-sm text-slate-700">
-        {message.content}
+        {isThreat && !isThreatRevealed ? (
+          <div className="space-y-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800">
+            <p className="text-sm font-medium">
+              View flagged content — may include threatening language.
+            </p>
+            <Button
+              variant="outline"
+              className="border-rose-200 bg-white text-rose-700 hover:bg-rose-100"
+              onClick={() => setIsThreatRevealed(true)}
+            >
+              View flagged content
+            </Button>
+          </div>
+        ) : (
+          message.content
+        )}
       </CardContent>
     </Card>
   );

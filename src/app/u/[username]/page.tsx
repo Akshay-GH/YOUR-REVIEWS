@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 import { ApiResponse } from "@/types/apiResponse";
 
@@ -28,6 +27,7 @@ export default function PublicProfilePage() {
   const [suggestedMessages, setSuggestedMessages] = useState<string[]>([]);
   const [isSuggestLoading, setIsSuggestLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [purpose, setPurpose] = useState("");
 
   const {
     register,
@@ -39,6 +39,23 @@ export default function PublicProfilePage() {
     resolver: zodResolver(messageSchema),
     defaultValues: { content: "" },
   });
+
+  useEffect(() => {
+    const fetchPurpose = async () => {
+      try {
+        const response = await axios.get<ApiResponse>(
+          `/api/message-purpose?userName=${encodeURIComponent(
+            decodeURIComponent(username),
+          )}`,
+        );
+        setPurpose(response.data.purpose || "");
+      } catch (error) {
+        console.error("Failed to fetch message purpose", error);
+      }
+    };
+
+    fetchPurpose();
+  }, [username]);
 
   // Send anonymous message
   const onSubmit = async (data: MessageFormData) => {
@@ -69,7 +86,7 @@ export default function PublicProfilePage() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ purpose }),
       });
 
       if (!response.ok) {
@@ -104,7 +121,7 @@ export default function PublicProfilePage() {
       <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-12">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-            Message Mint
+            MessageMint
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
             Send a thoughtful note to @{decodeURIComponent(username)}
@@ -117,7 +134,7 @@ export default function PublicProfilePage() {
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
           <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur">
             <h2 className="text-base font-semibold text-slate-900">
-              Write your message
+             {purpose.toUpperCase()}
             </h2>
             <p className="mt-1 text-xs text-slate-500">
               Aim for at least 10 characters. Max 300.

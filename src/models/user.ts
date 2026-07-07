@@ -3,12 +3,24 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface Message extends Document {
   content: string;
   createdAt: Date;
+  status: "safe" | "filtered" | "unmoderated";
+  flagReason?: "HARASSMENT" | "SEXUAL" | "THREAT" | "SPAM" | null;
 }
 
 const MessageSchema: Schema<Message> = new mongoose.Schema({
   content: {
     type: String,
     required: true,
+  },
+  status: {
+    type: String,
+    enum: ["safe", "filtered", "unmoderated"],
+    default: "safe",
+  },
+  flagReason: {
+    type: String,
+    enum: ["HARASSMENT", "SEXUAL", "THREAT", "SPAM", null],
+    default: null,
   },
   createdAt: {
     type: Date,
@@ -21,12 +33,14 @@ export interface User extends Document {
   userName: string;
   email: string;
   password: string;
+  purpose?: string;
   verifyCode: string;
   verifyCodeExpiry: Date;
   resetPasswordToken?: string | null;
   resetPasswordTokenExpiry?: Date | null;
-  isVerified: Boolean;
+  isVerified: boolean;
   isAcceptingMessage: boolean;
+  showFilteredMessages: boolean;
   messages: Message[];
 }
 
@@ -46,6 +60,12 @@ const UserSchema: Schema<User> = new Schema({
   password: {
     type: String,
     required: [true, "Password is required"],
+  },
+  purpose: {
+    type: String,
+    trim: true,
+    maxlength: 300,
+    default: "general anonymous social messaging",
   },
   verifyCode: {
     type: String,
@@ -71,6 +91,11 @@ const UserSchema: Schema<User> = new Schema({
     type: Boolean,
     required: true,
     default: true,
+  },
+  showFilteredMessages: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
   messages: [MessageSchema],
 });

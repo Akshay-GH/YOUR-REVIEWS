@@ -18,9 +18,9 @@ export async function sendVerificationEmail(
 ): Promise<ApiResponse> {
   try {
     await transporter.sendMail({
-      from: `"Your Reviews" <${process.env.EMAIL_USER}>`,
+      from: `"MessageMint" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Message Mint | Verification Code",
+      subject: "MessageMint | Verification Code",
       html: `
         <div style="font-family: Roboto, Verdana, sans-serif; padding: 20px;">
           <h2>Hello ${userName},</h2>
@@ -49,7 +49,7 @@ export async function sendPasswordResetEmail(
 ): Promise<ApiResponse> {
   try {
     await transporter.sendMail({
-      from: `"Your Reviews" <${process.env.EMAIL_USER}>`,
+      from: `"MessageMint" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "MessageMint | Reset Your Password",
       html: `
