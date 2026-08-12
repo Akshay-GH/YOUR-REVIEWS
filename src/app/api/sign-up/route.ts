@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         await existingUserByEmail.save();
       }
     } else {
-      // Remove any unverified user occupying this userName
+     
       await UserModel.deleteOne({ userName, isVerified: false });
 
       const hashedPassword = await bcrypt.hash(password, 10);
