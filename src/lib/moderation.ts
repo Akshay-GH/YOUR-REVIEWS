@@ -79,7 +79,7 @@ export async function classifyMessage(text: string): Promise<ModerationResult> {
 
   try {
     const result = await generateText({
-      model: groq("llama-3.1-8b-instant"),
+      model: groq("openai/gpt-oss-20b"),
       prompt: buildClassificationPrompt(text),
       temperature: 0,
       abortSignal: controller.signal,
