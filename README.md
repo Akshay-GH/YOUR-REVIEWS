@@ -40,7 +40,7 @@ The project goes beyond a basic message box by adding production-minded safety a
 | Database | MongoDB with Mongoose embedded message documents |
 | Rate Limiting | Upstash Redis REST API via `@upstash/redis` |
 | AI Suggestions | Vercel AI SDK with Groq `llama-3.3-70b-versatile` |
-| AI Moderation | Vercel AI SDK with Groq `llama-3.1-8b-instant` |
+| AI Moderation | Vercel AI SDK with Groq `openai/gpt-oss-20b` |
 | Email | Nodemailer with SMTP |
 | Forms & Validation | React Hook Form, Zod |
 | UI | Tailwind CSS 4, Radix UI, Lucide React, Sonner |
