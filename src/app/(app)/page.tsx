@@ -67,29 +67,29 @@ export default function Home() {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 text-sm text-slate-600 md:grid-cols-3">
-              <div className="rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm">
-                <p className="text-slate-900">Spam protection</p>
-                <p className="text-xs text-slate-500">Accept or pause inboxes.</p>
+            <div className="grid grid-cols-1 gap-4 text-sm text-slate-600 dark:text-slate-400 md:grid-cols-3">
+              <div className="rounded-2xl border border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 px-4 py-3 shadow-sm transition-colors duration-500">
+                <p className="text-slate-900 dark:text-slate-100">Spam protection</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Accept or pause inboxes.</p>
               </div>
-              <div className="rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm">
-                <p className="text-slate-900">AI icebreakers</p>
-                <p className="text-xs text-slate-500">Keep messages thoughtful.</p>
+              <div className="rounded-2xl border border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 px-4 py-3 shadow-sm transition-colors duration-500">
+                <p className="text-slate-900 dark:text-slate-100">AI icebreakers</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Keep messages thoughtful.</p>
               </div>
-              <div className="rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm">
-                <p className="text-slate-900">Private by default</p>
-                <p className="text-xs text-slate-500">Only you see the inbox.</p>
+              <div className="rounded-2xl border border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 px-4 py-3 shadow-sm transition-colors duration-500">
+                <p className="text-slate-900 dark:text-slate-100">Private by default</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Only you see the inbox.</p>
               </div>
             </div>
           </div>
 
           <div className="flex-1">
-            <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur">
+            <div className="rounded-3xl border border-white/60 dark:border-slate-800/60 bg-white/80 dark:bg-slate-950/80 p-6 shadow-xl backdrop-blur transition-colors duration-500">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-slate-700">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Live community notes
                 </p>
-                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                <span className="rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
                   New
                 </span>
               </div>
@@ -101,20 +101,20 @@ export default function Home() {
                 <CarouselContent>
                   {messages.map((message, index) => (
                     <CarouselItem key={index} className="p-2">
-                      <Card className="border-slate-200/60 bg-white/90 shadow-md">
+                      <Card className="border-slate-200/60 dark:border-slate-800 bg-white/90 dark:bg-slate-900/50 shadow-md transition-colors duration-500">
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-base text-slate-900">
+                          <CardTitle className="text-base text-slate-900 dark:text-slate-100">
                             {message.title}
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="flex flex-col items-start gap-3 text-sm text-slate-600">
+                        <CardContent className="flex flex-col items-start gap-3 text-sm text-slate-600 dark:text-slate-400">
                           <div className="flex items-start gap-3">
-                            <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+                            <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                               <Mail className="h-4 w-4" />
                             </span>
                             <div>
-                              <p className="text-slate-700">{message.content}</p>
-                              <p className="text-xs text-slate-400">
+                              <p className="text-slate-700 dark:text-slate-300">{message.content}</p>
+                              <p className="text-xs text-slate-400 dark:text-slate-500">
                                 {message.received}
                               </p>
                             </div>
@@ -124,15 +124,15 @@ export default function Home() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="-left-4" />
-                <CarouselNext className="-right-4" />
+                <CarouselPrevious className="-left-4 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" />
+                <CarouselNext className="-right-4 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" />
               </Carousel>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="text-center p-4 md:p-6 border-t border-white/60 bg-white/70 text-slate-600">
+      <footer className="text-center p-4 md:p-6 border-t border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-950/70 text-slate-600 dark:text-slate-400 transition-colors duration-500">
         © 2026 MessageMint. All rights reserved.
       </footer>
     </>

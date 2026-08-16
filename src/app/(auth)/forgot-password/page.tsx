@@ -50,19 +50,19 @@ function page() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(60%_80%_at_20%_10%,#ffe7b8_0%,#fff7ea_40%,#f7f2ff_70%,#eef2ff_100%)]">
-      <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#ff6b6b_0%,transparent_60%)] opacity-35 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-[-120px] right-[-80px] h-80 w-80 rounded-full bg-[radial-gradient(circle,#22c55e_0%,transparent_60%)] opacity-25 blur-3xl" />
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(60%_80%_at_20%_10%,#ffe7b8_0%,#fff7ea_40%,#f7f2ff_70%,#eef2ff_100%)] dark:bg-[radial-gradient(60%_80%_at_20%_10%,#1e1b4b_0%,#0f172a_40%,#020617_70%,#000000_100%)] transition-colors duration-500">
+      <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#ff6b6b_0%,transparent_60%)] dark:bg-[radial-gradient(circle,#818cf8_0%,transparent_60%)] opacity-35 dark:opacity-20 blur-3xl transition-opacity duration-500" />
+      <div className="pointer-events-none absolute bottom-[-120px] right-[-80px] h-80 w-80 rounded-full bg-[radial-gradient(circle,#22c55e_0%,transparent_60%)] dark:bg-[radial-gradient(circle,#34d399_0%,transparent_60%)] opacity-25 dark:opacity-10 blur-3xl transition-opacity duration-500" />
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md space-y-8 rounded-3xl border border-white/60 bg-white/80 p-8 shadow-xl backdrop-blur">
+        <div className="w-full max-w-md space-y-8 rounded-3xl border border-white/60 dark:border-slate-800/60 bg-white/80 dark:bg-slate-950/80 p-8 shadow-xl backdrop-blur transition-colors duration-500">
           <div className="text-center">
-            <span className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-slate-600">
+            <span className="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-slate-600 dark:text-slate-400">
               MessageMint
             </span>
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
               Reset your password
             </h1>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               We will send a reset link to your email.
             </p>
           </div>
@@ -74,9 +74,9 @@ function page() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-slate-900 dark:text-slate-200">Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
+                      <Input placeholder="you@example.com" className="rounded-xl border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/50 dark:text-slate-100" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,7 +86,7 @@ function page() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full rounded-full bg-slate-900 text-white hover:bg-slate-800"
+                className="w-full rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200"
               >
                 {isSubmitting ? (
                   <>
@@ -99,10 +99,10 @@ function page() {
             </form>
           </Form>
 
-          <div className="text-center text-sm text-slate-600">
+          <div className="text-center text-sm text-slate-600 dark:text-slate-400">
             <p>
               Remembered your password?{" "}
-              <Link href="/sign-in" className="font-semibold text-slate-900">
+              <Link href="/sign-in" className="font-semibold text-slate-900 dark:text-slate-200">
                 Sign in
               </Link>
             </p>
