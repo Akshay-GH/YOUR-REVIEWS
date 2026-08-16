@@ -48,18 +48,18 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
   };
 
   return (
-    <Card className="border-slate-200/70 bg-white/85 shadow-sm backdrop-blur">
+    <Card className="border-slate-200/70 dark:border-slate-800/60 bg-white/85 dark:bg-slate-900/80 shadow-sm backdrop-blur transition-colors duration-500">
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <CardTitle className="text-base text-slate-900">
+            <CardTitle className="text-base text-slate-900 dark:text-slate-100">
               Anonymous note
             </CardTitle>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               {dayjs(message.createdAt).format("MMM D, YYYY h:mm A")}
             </p>
             {isFiltered ? (
-              <p className="mt-2 w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+              <p className="mt-2 w-fit rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
                 Filtered: {message.flagReason}
               </p>
             ) : null}
@@ -68,22 +68,22 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
             <AlertDialogTrigger asChild>
               <Button
                 variant="outline"
-                className="h-9 w-9 rounded-full border-slate-200 text-slate-500 hover:text-slate-700"
+                className="h-9 w-9 rounded-full border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800"
               >
                 <X className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="dark:bg-slate-900 dark:border-slate-800 transition-colors duration-500">
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogTitle className="dark:text-slate-100">Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription className="dark:text-slate-400">
                   This action cannot be undone. This will permanently delete
                   this message.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteConfirm}>
+                <AlertDialogCancel className="dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteConfirm} className="dark:bg-rose-900 dark:text-rose-100 dark:hover:bg-rose-800">
                   Continue
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -91,15 +91,15 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
           </AlertDialog>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 text-sm text-slate-700">
+      <CardContent className="pt-0 text-sm text-slate-700 dark:text-slate-300">
         {isThreat && !isThreatRevealed ? (
-          <div className="space-y-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800">
+          <div className="space-y-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-rose-800 dark:text-rose-400 transition-colors duration-500">
             <p className="text-sm font-medium">
               View flagged content — may include threatening language.
             </p>
             <Button
               variant="outline"
-              className="border-rose-200 bg-white text-rose-700 hover:bg-rose-100"
+              className="border-rose-200 dark:border-rose-800 bg-white dark:bg-slate-900 text-rose-700 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/50"
               onClick={() => setIsThreatRevealed(true)}
             >
               View flagged content
