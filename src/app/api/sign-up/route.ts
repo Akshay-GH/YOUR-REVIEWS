@@ -1,9 +1,25 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel from "@/models/user"
+import UserModel from "@/models/user";
 import bcrypt from "bcryptjs";
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
 import { normalizeUserName } from "@/lib/username";
+import { checkSignUpRateLimit, getClientIp } from "@/lib/rateLimit";
+import { randomInt } from "crypto";
+
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateLimit = await checkSignUpRateLimit(ip);
+
+  if (!rateLimit.allowed) {
+    return Response.json(
+      {
+        success: false,
+        message: "Too many sign-up attempts. Please try again later.",
+      },
+      { status: 429 }
+    );
+  }
+
   await dbConnect();
   try {
     const { userName: rawUserName, email, password } = await request.json();
@@ -28,7 +44,7 @@ export async function POST(request: Request) {
       email,
     });
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = randomInt(100000, 1000000).toString();
     if (existingUserByEmail) {
       //condition
       if (existingUserByEmail.isVerified) {

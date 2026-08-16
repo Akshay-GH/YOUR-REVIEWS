@@ -2,6 +2,7 @@ import { groq } from "@ai-sdk/groq";
 import { streamText } from "ai";
 import { NextResponse } from "next/server";
 import { sanitizeMessagePurpose } from "@/lib/purpose";
+import { checkSuggestMessagesRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export const runtime = "edge";
 
@@ -32,6 +33,19 @@ Relevant question one?||Relevant question two?||Relevant question three?`;
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+    const rateLimit = await checkSuggestMessagesRateLimit(ip);
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { 
+          error: "Too many suggestion requests. Please try again later.",
+          resetTimeMs: rateLimit.resetTimeMs
+        },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const purpose = sanitizeMessagePurpose(body.purpose);
     const prompt = buildSuggestionPrompt(purpose);

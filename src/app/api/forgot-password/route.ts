@@ -3,9 +3,9 @@ import UserModel from "@/models/user";
 import { forgotPasswordSchema } from "@/schemas/forgotPasswordSchema";
 import { sendPasswordResetEmail } from "@/helpers/sendVerificationEmail";
 import { randomBytes, createHash } from "crypto";
+import { checkForgotPasswordRateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
-  await dbConnect();
   try {
     const body = await request.json();
     const parsed = forgotPasswordSchema.safeParse(body);
@@ -17,6 +17,16 @@ export async function POST(request: Request) {
     }
 
     const { email } = parsed.data;
+    
+    const rateLimit = await checkForgotPasswordRateLimit(email);
+    if (!rateLimit.allowed) {
+      return Response.json(
+        { success: false, message: "Too many password reset requests. Please try again later." },
+        { status: 429 },
+      );
+    }
+
+    await dbConnect();
     const user = await UserModel.findOne({ email, isVerified: true });
 
     if (user) {

@@ -3,10 +3,15 @@ import { getRedisClient } from "@/lib/redis";
 const WINDOW_SECONDS = 60 * 60;
 const PER_LINK_LIMIT = 5;
 const GLOBAL_IP_LIMIT = 20;
+const SIGN_UP_IP_LIMIT = 5;
+const VERIFY_ATTEMPTS_LIMIT = 5;
+const FORGOT_PASSWORD_LIMIT = 3;
+const SUGGEST_MESSAGES_LIMIT = 10;
 
 export type RateLimitResult = {
   allowed: boolean;
   reason?: "per-link" | "global";
+  resetTimeMs?: number;
 };
 
 type RequestWithConnection = Request & {
@@ -79,3 +84,68 @@ export async function checkRateLimit(
     return { allowed: true };
   }
 }
+
+export async function checkSignUpRateLimit(
+  ip: string
+): Promise<RateLimitResult> {
+  try {
+    const count = await incrementWindowCounter(`rl:signup:${ip}`);
+    if (count > SIGN_UP_IP_LIMIT) {
+      return { allowed: false, reason: "global" };
+    }
+    return { allowed: true };
+  } catch (error) {
+    console.error("Signup rate limit check failed", error);
+    return { allowed: true };
+  }
+}
+
+export async function checkVerifyRateLimit(
+  userName: string
+): Promise<RateLimitResult> {
+  try {
+    const count = await incrementWindowCounter(`rl:verify:${userName}`);
+    if (count > VERIFY_ATTEMPTS_LIMIT) {
+      return { allowed: false, reason: "global" };
+    }
+    return { allowed: true };
+  } catch (error) {
+    console.error("Verify rate limit check failed", error);
+    return { allowed: true };
+  }
+}
+
+export async function checkForgotPasswordRateLimit(
+  email: string
+): Promise<RateLimitResult> {
+  try {
+    const count = await incrementWindowCounter(`rl:forgot-password:${email}`);
+    if (count > FORGOT_PASSWORD_LIMIT) {
+      return { allowed: false, reason: "global" };
+    }
+    return { allowed: true };
+  } catch (error) {
+    console.error("Forgot password rate limit check failed", error);
+    return { allowed: true };
+  }
+}
+
+export async function checkSuggestMessagesRateLimit(
+  ip: string
+): Promise<RateLimitResult> {
+  try {
+    const key = `rl:suggest:${ip}`;
+    const count = await incrementWindowCounter(key);
+    if (count > SUGGEST_MESSAGES_LIMIT) {
+      const redis = getRedisClient();
+      const ttl = await redis.ttl(key);
+      const resetTimeMs = Date.now() + ttl * 1000;
+      return { allowed: false, reason: "global", resetTimeMs };
+    }
+    return { allowed: true };
+  } catch (error) {
+    console.error("Suggest messages rate limit check failed", error);
+    return { allowed: true };
+  }
+}
+

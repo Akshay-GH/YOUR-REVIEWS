@@ -2,12 +2,25 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/user";
 import { verifySchema } from "@/schemas/verifySchema";
 import { normalizeUserName } from "@/lib/username";
+import { checkVerifyRateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
-  await dbConnect();
   try {
-    const body= await request.json();
+    const body = await request.json();
     const decodedUser = normalizeUserName(decodeURIComponent(body.username)); // insure the values passed through url are decoded
+
+    const rateLimit = await checkVerifyRateLimit(decodedUser);
+    if (!rateLimit.allowed) {
+      return Response.json(
+        {
+          success: false,
+          message: "Too many verification attempts. Please try again later.",
+        },
+        { status: 429 }
+      );
+    }
+
+    await dbConnect();
     const validCode = verifySchema.safeParse({ code:body.code });
 
     // check zod validation
@@ -29,7 +42,7 @@ export async function POST(request: Request) {
           message: "user does not exist",
         },
         {
-          status: 500,
+          status: 404,
         },
       );
     }
@@ -57,7 +70,7 @@ export async function POST(request: Request) {
           message: "code is expired , kindly redirect to signup ",
         },
         {
-          status: 500,
+          status: 400,
         },
       );
 
@@ -68,7 +81,7 @@ export async function POST(request: Request) {
           message: "code is invalid ",
         },
         {
-          status: 500,
+          status: 400,
         },
       );
     }
