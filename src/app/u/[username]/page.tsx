@@ -11,13 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { ApiResponse } from "@/types/apiResponse";
-
-const messageSchema = z.object({
-  content: z
-    .string()
-    .min(10, { message: "Message must be at least 10 characters" })
-    .max(300, { message: "Message must be no longer than 300 characters" }),
-});
+import { messageSchema } from "@/schemas/messageSchema";
 
 type MessageFormData = z.infer<typeof messageSchema>;
 
@@ -90,7 +84,19 @@ export default function PublicProfilePage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch suggestions");
+        let errorMessage = "Failed to fetch suggestions";
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            if (errorData.resetTimeMs) {
+              const time = new Date(errorData.resetTimeMs).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+              errorMessage = `Too many requests, cannot suggest messages till ${time}`;
+            } else {
+              errorMessage = errorData.error;
+            }
+          }
+        } catch (_) {}
+        throw new Error(errorMessage);
       }
 
       const text = await response.text();
@@ -99,9 +105,9 @@ export default function PublicProfilePage() {
         .map((q) => q.trim())
         .filter(Boolean);
       setSuggestedMessages(questions);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast("Error", { description: "Failed to suggest messages" });
+      toast("Error", { description: error.message || "Failed to suggest messages" });
     } finally {
       setIsSuggestLoading(false);
     }
@@ -137,7 +143,7 @@ export default function PublicProfilePage() {
              {purpose.toUpperCase()}
             </h2>
             <p className="mt-1 text-xs text-slate-500">
-              Aim for at least 10 characters. Max 300.
+              Aim for at least 10 characters. Max 500.
             </p>
             <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-4">
               <textarea
